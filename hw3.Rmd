@@ -1,0 +1,106 @@
+---
+title: "Homework3"
+author: "Tung Nguyen"
+date: "2/17/2020"
+output: pdf_document
+---
+
+
+```{r}
+knitr::opts_chunk$set(echo=FALSE, comment=NA)
+```
+
+# Problem 2.1
+```{r problem 2.1, include=FALSE}
+data2.1 = read.csv('./internet.csv', header=TRUE)
+print(head(data2.1))
+
+```
+```{r Exploring data, include=FALSE}
+print('-------------')
+print(colnames(data2.1))
+print(nrow(data2.1))
+```
+## a. Find the least square line for the data.
+```{r Solutions}
+# Gdp = data2.1$Gdp
+# Int = data2.1$Int
+Internet.lm=lm(Int~Gdp, data=data2.1)
+summary(Internet.lm)
+```
+
+
+
+**The least square line for the data, based on the output, is:**
+
+> $\hat{Y} = \hat{b}_{0} + \hat{b}_{1}X$ = 12.363 + 1.36X
+
+## b. Interpret the estimates of the slop and the intercept in the context of the problem
+
+> Since the intercept is 12.363, when GDP equals 0, about 12.363% of the population of that country uses the Internet.
+
+> Since GDP = 1.36, when GDP increases by 1000 $USD, the percentage of the corresponding population increases by 1.36%.
+
+## c. Predict the percentage of the Internet users if GDP per capita is US$20,000.
+
+```{r}
+predict(Internet.lm, newdata = data.frame(Gdp = 20))
+```
+
+> Accordingly, when Gdp = 20, Int ~ 39.581.
+
+## d. Draw a scatterplot with Int on the vertical axis and Gdp on the horizontal axis. Add the least squares line to the plot
+
+```{r}
+Gdp = data2.1$Gdp
+Int = data2.1$Int
+conf.int =  predict(Internet.lm, interval="confidence")
+fitted.values = conf.int[,1]
+plot(Gdp,Int)
+lines(Gdp,fitted.values,col="red",lwd=2)
+```
+
+## e. Based on the scaterplot, do you think it is appropriate to use this simple linear regression model on this problem, or is the model potentially misleading.
+
+> The model is potentially misleading. As the plot suggests, when Gdp =0, the internet usage is around 12% of the population. This result,indeed, does not make sense.
+
+# Problem 2.5
+
+> Exploring data
+
+```{r Data exploration}
+data2.5 = read.csv('./cars2.csv', header=TRUE)
+head(data2.5)
+```
+## a. Transform city miles per gallon into "city gallons per hundred miles". In other words, create another variable called Cgphm = 100/Cmpg.
+
+> Here are the first five rows of the transformed data
+
+```{r Transform city miles per gall}
+data2.5$Cgphm = 100 / data2.5$Cmpg
+print(head(data2.5))
+```
+> The mean of the newly transformed variable is
+
+```{r}
+mean(data2.5$Cgphm)
+```
+## b. Predicting Cgphm using Eng or Vol
+
+### Predicting Cgphm using Eng
+
+```{r}
+Eng.lm = lm(Cgphm~Eng, data=data2.5)
+summary(Eng.lm)
+```
+### Predicting Cgphm using Vol
+
+```{r}
+Vol.lm = lm(Cgphm~Vol, data=data2.5)
+summary(Vol.lm)
+
+```
+## C. Report the regression standard error (s) for the model you recommended in part (b). Say something about the predictive ability of your model.
+
+
+# 2.7 
