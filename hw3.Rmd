@@ -8,19 +8,17 @@ output: pdf_document
 
 ```{r}
 knitr::opts_chunk$set(echo=FALSE, comment=NA)
+library(alr3)
 ```
 
 # Problem 2.1
 ```{r problem 2.1, include=FALSE}
-data2.1 = read.csv('./internet.csv', header=TRUE)
+data2.1 = read.csv('./data/internet.csv', header=TRUE)
 print(head(data2.1))
+```
 
-```
-```{r Exploring data, include=FALSE}
-print('-------------')
-print(colnames(data2.1))
-print(nrow(data2.1))
-```
+
+
 ## a. Find the least square line for the data.
 ```{r Solutions}
 # Gdp = data2.1$Gdp
@@ -69,7 +67,7 @@ lines(Gdp,fitted.values,col="red",lwd=2)
 > Exploring data
 
 ```{r Data exploration}
-data2.5 = read.csv('./cars2.csv', header=TRUE)
+data2.5 = read.csv('./data/cars2.csv', header=TRUE)
 head(data2.5)
 ```
 ## a. Transform city miles per gallon into "city gallons per hundred miles". In other words, create another variable called Cgphm = 100/Cmpg.
@@ -100,7 +98,113 @@ Vol.lm = lm(Cgphm~Vol, data=data2.5)
 summary(Vol.lm)
 
 ```
-## C. Report the regression standard error (s) for the model you recommended in part (b). Say something about the predictive ability of your model.
+> I would recommend using the model with predictor Eng. Althought both model output p-value < 0.001, the R-squared for the Eng model is 0.7726 while that of the Vol model is only 0.1755. The result means the the Eng model captures more variability of the response than the Vol model. 
+
+## c. Report the regression standard error (s) for the model you recommended in part (b). Say something about the predictive ability of your model.
+```{r}
+MSE = anova(Eng.lm)
+print(MSE)
+s = sqrt(MSE$`Mean Sq`)
+cat('\n\n\n')
+cat('The regression standard deviation s is:', s)
+```
+> The five number summary for Cgphm is:
+
+```{r}
+summary(data2.5$Cgphm)
+```
+
+> Since s = 6.906 > Max = 6.667, the model errors seem to be pretty big. Hence, its predictive ability is not reliable.
+
+# 2.7
+
+## a. 95% confidence interval for the regression slope.
+```{r}
+confint(Eng.lm)
+```
+> The 95% confidence interval for the slop $\beta_{1}$ is (0.7396795, 0.8968317)
+
+## b. Use the model with Eng as the predictor to find 95% confidence interval for the mean Cgphm when Eng = 3
+```{r}
+predict(Eng.lm, newdata = data.frame(Eng=3), interval = 'confidence')
+```
+> When Cgphm = 3, the 95% CI for the mean response is (4.972238, 5.116142)
 
 
-# 2.7 
+## c. Use the model with Eng as the predictor to find 95% prediction interval for the mean Cgphm when Eng = 3
+```{r}
+predict(Eng.lm, newdata = data.frame(Eng=3), interval = 'prediction')
+```
+> The 95% PI when Eng = 3 is (4.377044, 5.711335)
+
+# 2.10
+
+# 2.2 Weissberg - Forbes data
+
+> Creating $\mu_{1}$  
+
+```{r Create mu}
+forbes$mu1 = 1 / (forbes$Temp* (5/9) + 255.37)
+head(forbes)
+
+```
+## 2.2.1 Draw a plot between lpres and mu1. Verify point 12 falls outisde of the straight line.
+
+```{r Plot Lpres vs mu1}
+plot(forbes$mu1, forbes$Lpres)
+text(forbes$mu1, forbes$Lpres,  row.names(forbes),
+     cex=0.65, pos=3,col="red") 
+
+```
+
+> As the plot shows, case 12 falls outside of the line from the rest.
+
+## 2.2.2 Compute and summarize the linear regression
+
+```{r}
+f.lm = lm(Lpres~mu1, data = forbes)
+summary(f.lm)
+```
+
+## 2.2.4 Find the estimated mean function for the hooker's data
+
+```{r Compute Lpres data}
+hooker$mu1 = 1 / (hooker$Temp* (5/9) + 255.37)
+hooker$Lpres = 100 * log10(hooker$Pressure)
+hookerlm = lm(Lpres~mu1, data = hooker)
+summary(hookerlm)
+```
+
+> The mean function for the hooker data is:
+> E(Pres|Temp) = 7.249e+02 + -2.155e+05 * $\mu_{1}$
+
+## 2.2.5 Predictions and Standard Deviations
+
+```{r}
+predictions = predict(hookerlm, se.fit=TRUE)
+cat('The predictions are')
+cat('\n\n\n')
+cat(predictions$fit)
+cat('\n\n\n')
+cat('The standard deviation of the predictions is', sd(predictions$fit))
+```
+Computing sepred $sepred = \sqrt{\sigma^2(1+ \frac{1}{n} + \frac{(x - \bar{x})^2}{S_{xx}}}$
+```{r}
+sepred = sqrt(0.353^2 + predictions$se.fit^2)
+sepred
+```
+
+Computing the mean and std of z
+```{r}
+z = (hooker$Lpres - predictions$fit) / sepred
+mean(z)
+sd(z)
+```
+> The mean of the z variable is -0.0007397783 while the standard deviation is 0.9548463
+
+## 2.2.6 Repeat 2.2.5 for the Forbe's case
+
+```{r}
+predictionforbes = predict(hookerlm, newdata = forbes$Temp)
+```
+
