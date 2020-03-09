@@ -1,0 +1,78 @@
+---
+title: "Homework 4"
+author: "Tung Nguyen"
+date: "March 9, 2020"
+output: pdf_document
+---
+
+
+```{r load package}
+knitr::opts_chunk$set(echo=FALSE, comment=NA)
+```
+## 3.1
+```{r}
+movies = read.csv('movies.csv', header = TRUE)
+head(movies)
+
+```
+
+&nbsp;&nbsp;&nbsp;&nbsp;a. Model for 3 predictors of Box response:
+
+E(Box) = $b_{0} + b_{1}Rate + b_{2}User + b_{3}Meta$
+
+&nbsp;&nbsp;&nbsp;&nbsp;b. Write the estimated equation
+```{r fit model}
+movies.lm = lm(Box ~ Rate + User + Meta, data = movies)
+summary(movies.lm)
+```
+ - $\bar{BOX} = -169.08 + 35.5Rate + 0.43User + 1.25Meta$
+
+&nbsp;&nbsp;&nbsp;&nbsp;c. Interpret the parameter Rate
+
+For an increase in user rating, there's a corresponding increase of 35 units in Box office receipts, when all other variables is held constant.
+
+## 3.3 
+&nbsp;&nbsp;&nbsp;&nbsp;a. 
+```{r }
+box.lm = lm(Box ~ Rate + User + Meta + Len + Win + Nom, data = movies)
+summary(box.lm)
+anova(box.lm)
+```
+The SSE = 32435
+&nbsp;&nbsp;&nbsp;&nbsp;b.
+```{r}
+anova(movies.lm)
+```
+The SSE for model with 3 variables is: 32823
+
+&nbsp;&nbsp;&nbsp;&nbsp;e. COmpare s and $R^2$ adjusted values of the two models:
+```{r}
+cat('Full model: s\n')
+cat(sqrt(anova(box.lm)$`Mean Sq`))
+cat('\nAdjusted R-squared:  0.8472\n')
+cat(paste(rep('===',8),sep=''))
+cat(paste('\nReduced model: s\n'))
+cat(sqrt(anova(movies.lm)$`Mean Sq`))
+cat('\nAdjusted R-squared:  0.8675')
+
+```
+
+## 4.8 Estimated Equation: $E(\widehat{Salary|Sex}) = 24697 - 3340Sex$
+
+&nbsp;&nbsp;&nbsp;&nbsp;1. Describe the meaning of the estimated equation:
+
+- The average salary for all faculty regardless of their sexes is 24697. When sex is taken into account, the male faculty, on average, makes $3340 more than their female counterpart.
+
+&nbsp;&nbsp;&nbsp;&nbsp;2. additiional model: $E(\widehat{Salary|Sex}) = 24697 + 201Sex + 759Years$
+
+[TODO] Ask Ellingson about this
+
+## 5.
+```{r load dataset}
+BGS = read.table('BGSgirls.txt',header = TRUE)
+head(BGS)
+colnames(BGS)
+plots = c("WT2", "HT2", "WT9", "HT9", "ST9", "Soma")
+plot(~WT2+WT9+ST9+Soma, data=BGS)
+```
+
